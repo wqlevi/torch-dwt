@@ -3,21 +3,21 @@ import torch
 from pywt import Wavelet
 import torch.nn.functional as F
 from .lowlevel import _dwt1d, _idwt1d, _dwt2, _idwt2, _dwt3, _idwt3
+from typing import Union
+from typing import Tuple as tuple
+
+def _to_wavelet_coefs(wavelet: Union[str , torch.Tensor , Wavelet]) -> torch.Tensor:
+    if isinstance(wavelet, str):
+        return torch.tensor(Wavelet(wavelet).filter_bank)[2:]
+    elif isinstance(wavelet, torch.Tensor):
+        return wavelet
+    elif isinstance(wavelet, Wavelet):
+        return torch.tensor(wavelet.filter_bank)[2:]
+    else:
+        raise Exception("Unknown type!")
 
 
-def _to_wavelet_coefs(wavelet: str | torch.Tensor | Wavelet) -> torch.Tensor:
-    match wavelet:
-        case str():
-            return torch.tensor(Wavelet(wavelet).filter_bank)[2:]
-        case torch.Tensor():
-            return wavelet
-        case Wavelet():
-            return torch.tensor(wavelet.filter_bank)[2:]
-        case _:
-            raise Exception("")
-
-
-def dwt(x: torch.Tensor, wavelet: str | torch.Tensor | Wavelet) -> torch.Tensor:
+def dwt(x: torch.Tensor, wavelet: Union[str , torch.Tensor , Wavelet]) -> torch.Tensor:
     """performs the 1D discrete wavelet transform
 
     Args:
@@ -35,7 +35,7 @@ def dwt(x: torch.Tensor, wavelet: str | torch.Tensor | Wavelet) -> torch.Tensor:
     return result.reshape(x.shape[0], 2, x.shape[1], -1)
 
 
-def idwt(x: torch.Tensor, wavelet: str | torch.Tensor | Wavelet) -> torch.Tensor:
+def idwt(x: torch.Tensor, wavelet: Union[str , torch.Tensor , Wavelet]) -> torch.Tensor:
     """performs the 1D inverse discrete wavelet transform
 
     Args:
@@ -52,7 +52,7 @@ def idwt(x: torch.Tensor, wavelet: str | torch.Tensor | Wavelet) -> torch.Tensor
     return result.squeeze(2).squeeze(2)
 
 
-def dwt2(x: torch.Tensor, wavelet: str | torch.Tensor | Wavelet) -> torch.Tensor:
+def dwt2(x: torch.Tensor, wavelet: Union[str , torch.Tensor , Wavelet]) -> torch.Tensor:
     """performs the 2D discrete wavelet transform
 
     Args:
@@ -67,7 +67,7 @@ def dwt2(x: torch.Tensor, wavelet: str | torch.Tensor | Wavelet) -> torch.Tensor
     return _dwt2(x, filter)
 
 
-def idwt2(x: torch.Tensor, wavelet: str | torch.Tensor | Wavelet) -> torch.Tensor:
+def idwt2(x: torch.Tensor, wavelet: Union[str , torch.Tensor , Wavelet]) -> torch.Tensor:
     """performs the 2D inverse discrete wavelet transform
 
     Args:
@@ -81,7 +81,7 @@ def idwt2(x: torch.Tensor, wavelet: str | torch.Tensor | Wavelet) -> torch.Tenso
     return _idwt2(x, lohi)
 
 
-def dwt3(x: torch.Tensor, wavelet: str | torch.Tensor | Wavelet) -> torch.Tensor:
+def dwt3(x: torch.Tensor, wavelet:Union[ str , torch.Tensor , Wavelet]) -> torch.Tensor:
     """performs the 2D discrete wavelet transform
 
     Args:
@@ -95,7 +95,7 @@ def dwt3(x: torch.Tensor, wavelet: str | torch.Tensor | Wavelet) -> torch.Tensor
     return _dwt3(x, filter)
 
 
-def idwt3(x: torch.Tensor, wavelet: str | torch.Tensor | Wavelet) -> torch.Tensor:
+def idwt3(x: torch.Tensor, wavelet:Union[ str , torch.Tensor , Wavelet]) -> torch.Tensor:
     """performs the 3D inverse discrete wavelet transform
 
     Args:
